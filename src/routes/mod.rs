@@ -1,11 +1,14 @@
 use actix_web::{web,post,Responder,HttpResponse};
 use chrono::Utc;
 use uuid::Uuid;
-
+use std::collections::HashMap;
+use std::sync::Mutex;
 use crate::models::bookmark::{Bookmark,NewBookmark};
 
 #[post("/bookmarks")]
-async fn create_bookmark(bookmark_data: web::Json<NewBookmark>)->impl Responder{
+async fn create_bookmark(
+bookmark_data: web::Json<NewBookmark>,
+store: web::Data<Mutex<HashMap<Uuid,Bookmark>>>,)->impl Responder{
 //creating a new Bookmark instance from the input NewBookmark
 let new_data = bookmark_data.into_inner();
    
@@ -25,6 +28,7 @@ id: Uuid::new_v4(),
    new_bookmark.id,
    new_bookmark.created_at,
 );
+   store.lock().unwrap().insert(new_bookmark.id, new_bookmark.clone());
    HttpResponse::Ok().body(format!("Bookmark '{}' added successfully!",
    //toh since the title is an option so we made it unwrap 
    new_bookmark.title.unwrap_or("Untitled".to_string())))
