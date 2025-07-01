@@ -28,10 +28,10 @@ Frontend (or Postman)
 
 ```mermaid
 flowchart TD
-    A[Frontend (or Postman)] --> B[HTTP Request (POST / GET / DELETE)]
-    B --> C[Actix Web Server (main.rs)]
-    C --> D[Router (decides which handler to call)]
-    D --> E[Handlers (logic for each route)]
-    E --> F[Models (Bookmark struct)]
-    F --> G[Storage (in-memory HashMap for now)]
+    A[Frontend or Postman] --> B[HTTP Request: POST / GET / DELETE]
+    B --> C[Actix Web Server - main.rs]
+    C --> D[Router - decides which handler to call]
+    D --> E[Handlers - logic for each route]
+    E --> F[Models - Bookmark struct]
+    F --> G[Storage - in-memory HashMap]
 ```
