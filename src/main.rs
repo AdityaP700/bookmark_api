@@ -1,7 +1,24 @@
 mod routes;
+use actix_web::{web, App, HttpServer};
+use std::sync::Mutex;
+use crate::routes::create_bookmark;
+use std::collections::HashMap;
+use uuid::Uuid;
+use crate::models::bookmark::Bookmark;
 pub mod models;
+#[actix_web::main]
 
-// (your existing code in lib.rs)
-fn main() {
-    println!("Hello, world!");
+ async fn main() {
+    let store: web::Data<Mutex<_>> = web::Data::new(Mutex::new(HashMap::<Uuid, Bookmark>::new()));
+
+    HttpServer::new(move||{
+        App::new()
+        .app_data(store.clone())
+        .service(create_bookmark)
+
+    })
+    .bind("127.0.0.1:8080").unwrap()
+    .run()
+    .await
+    .expect("Failed to run the server");
 }
