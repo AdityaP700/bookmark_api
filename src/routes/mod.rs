@@ -1,4 +1,4 @@
-use actix_web::{web,post,Responder,HttpResponse};
+use actix_web::{web,post,Responder,HttpResponse,get};
 use chrono::Utc;
 use uuid::Uuid;
 use std::collections::HashMap;
@@ -32,5 +32,32 @@ id: Uuid::new_v4(),
    HttpResponse::Ok().body(format!("Bookmark '{}' added successfully!",
    //toh since the title is an option so we made it unwrap 
    new_bookmark.title.unwrap_or("Untitled".to_string())))
-     
+}
+
+#[get("/bookmarks")]
+async fn get_bookmarks(
+   store: web::Data<Mutex<HashMap<Uuid, Bookmark>>>
+
+)->impl Responder{
+      let bookmarks = store.lock().unwrap();
+      let bookmarks_list: Vec<Bookmark> = bookmarks.values().cloned().collect();
+      
+      if bookmarks_list.is_empty() {
+         HttpResponse::NotFound().body("No bookmarks found.")
+      } else {
+         HttpResponse::Ok().json(bookmarks_list)
+  }
+}
+#[get("/bookmarks/{id}")]
+async fn get_bookmark_by_id(
+   id: web::Path<Uuid>,
+   store: web::Data<Mutex<HashMap<Uuid, Bookmark>>>
+) -> impl Responder {
+   let id = id.into_inner();
+   let bookmarks = store.lock().unwrap();
+
+   match bookmarks.get(&id) {
+      Some(bookmark) => HttpResponse::Ok().json(bookmark.clone()),
+      None => HttpResponse::NotFound().body("Bookmark not found."),
+   }
 }
