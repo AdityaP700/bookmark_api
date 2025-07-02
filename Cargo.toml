@@ -6,7 +6,12 @@ edition = "2024"
 actix-web = "4"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-uuid = { version = "1.7", features = ["serde", "v4", "rng"] }
+uuid = { version = "1", features = ["v4", "serde"] }
 chrono = { version = "0.4", features = ["serde"] }
 rand = "0.8"
+actix-cors = "0.7.1"
+sqlx = { version = "0.7", features = ["runtime-tokio-rustls", "postgres", "uuid", "chrono", "macros"] }
+tokio = { version = "1", features = ["full"] }
+dotenvy = "0.15"
+
 
