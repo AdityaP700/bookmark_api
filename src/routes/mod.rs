@@ -1,5 +1,5 @@
 use crate::models::bookmark::{Bookmark, NewBookmark};
-use actix_web::{HttpResponse, Responder, delete, get, post, web};
+use actix_web::{HttpResponse, Responder, delete, get, post,put, web};
 use chrono::Utc;
 use std::collections::HashMap;
 use std::sync::Mutex;
@@ -78,5 +78,29 @@ async fn delete_bookmark(
         HttpResponse::Ok().body(format!("Bookmark with ID {} deleted successfully", id))
     } else {
         HttpResponse::NotFound().body(format!("Bookmark with ID {} not found", id))
+    }
+}
+#[put("/bookmarks/{id}")]
+async fn update_bookmark(
+    id: web::Path<Uuid>,
+    bookmark_data:web::Json<NewBookmark>,
+    store:web::Data<Mutex<HashMap<Uuid, Bookmark>>>,
+)->impl Responder{
+    let id= id.into_inner();
+    let mut bookmarks = store.lock().unwrap();
+    let new_data = bookmark_data.into_inner();
+    //hame match karna hai
+    match bookmarks.get_mut(&id){
+        //then update the bookmark
+        Some(bookmark)=>{
+            bookmark.url =new_data.url;
+            bookmark.title = new_data.title;
+            bookmark.description = new_data.description;
+            bookmark.created_at = Utc::now(); // Update the timestamp
+            HttpResponse::Ok().json(bookmark.clone())
+        }
+        None => {
+            HttpResponse::NotFound().body(format!("Bookmark with ID {} not found", id))
+        }
     }
 }
